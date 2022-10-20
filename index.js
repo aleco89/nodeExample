@@ -1,7 +1,10 @@
-const app = require("express")();
+const express = require("express");
+const app = express();
 
 app.get("/", (req, res) => {
-  res.json({ name: "Ana" }).status(200);
+  res.json({ message: "Hola mundo" });
 });
 
-app.listen(3000);
+app.listen(3000, () => {
+  return console.log(`Server running on 3000`);
+});
