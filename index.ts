@@ -1,8 +1,8 @@
 import express from "express";
-import bodyParser from "body-parser";
+import bodyParser, { urlencoded } from "body-parser";
 const app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json(), urlencoded({ extended: true }));
 
 const product: { id: number; name: string; marca: string }[] = [];
 
