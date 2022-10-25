@@ -6,25 +6,25 @@ app.use(bodyParser.json(), urlencoded({ extended: true }));
 
 const product: { id: number; name: string; marca: string }[] = [];
 
-app.get("/hola", (req, res) => {
+app.get("/products", (req, res) => {
   res.status(200).json(product);
 });
 /*
 Libreria body-parser resuelve problemas al interpretar el body 
 */
 
-app.post("/hola", (req, res) => {
+app.post("/products", (req, res) => {
   const { name, marca } = req.body;
   try {
     if (!name || !marca) throw new Error("che pasame el name y marca");
     product.push({ id: new Date().getTime(), name, marca });
-    res.status(200).json(...product.slice(-1));
+    res.status(201).json(...product.slice(-1));
   } catch (err) {
     return res.status(400).json({ message: err.message });
   }
 });
 
-app.put("/hola", (req, res) => {
+app.put("/products", (req, res) => {
   const { name, marca, id } = req.body;
   const index = product.findIndex((product) => product.id === id);
   if (index === -1)
@@ -33,7 +33,7 @@ app.put("/hola", (req, res) => {
   res.status(200).json(product[index]);
 });
 
-app.delete("/hola", (req, res) => {
+app.delete("/products", (req, res) => {
   res.status(200).json({ name: "Ana" });
 });
 
