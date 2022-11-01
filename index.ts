@@ -47,7 +47,7 @@ app.put("/products/:id", (req, res) => {
   res.status(200).json(product[index]);
 });
 
-app.delete("/product/:id", (req, res) => {
+app.delete("/products/:id", (req, res) => {
   const id = Number(req.params.id);
   const index = product.findIndex((product) => product.id === id);
   if (index === -1)
