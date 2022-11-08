@@ -59,7 +59,7 @@ app.get("/products", (req, res) => {
 
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
-  if (search != "") {
+  if (search !== "") {
     const filteredProducts = product.filter(
       (p) =>
         p.name.toLowerCase().includes(search) ||
@@ -67,9 +67,10 @@ app.get("/products", (req, res) => {
     );
     const resultFilteredProducts = filteredProducts.slice(startIndex, endIndex);
     res.status(200).json(resultFilteredProducts);
+  } else {
+    const resultProducts = product.slice(startIndex, endIndex);
+    res.status(200).json(resultProducts);
   }
-  const resultProducts = product.slice(startIndex, endIndex);
-  res.status(200).json(resultProducts);
 });
 
 app.post("/products", (req, res) => {
