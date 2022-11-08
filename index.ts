@@ -53,15 +53,24 @@ const product: { id: number; name: string; brand: string }[] = [
 app.get("/products", (req, res) => {
   const page: number = Number(req.query.page);
   const limit: number = Number(req.query.limit);
+  const search: string = String(req.query.search);
 
   const result = {};
 
-  const starIndex = (page - 1) * limit;
+  const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
-
-  const resultProducts = product.slice(starIndex, endIndex);
-
-  res.status(200).json(resultProducts);
+  if (search) {
+    const filteredProducts = product.filter(
+      (p) =>
+        p.name.toLowerCase().includes(search) ||
+        p.brand.toLowerCase().includes(search)
+    );
+    const resultFilteredProducts = filteredProducts.slice(startIndex, endIndex);
+    res.status(200).json(resultFilteredProducts);
+  } else {
+    const resultProducts = product.slice(startIndex, endIndex);
+    res.status(200).json(resultProducts);
+  }
 });
 
 app.post("/products", (req, res) => {
