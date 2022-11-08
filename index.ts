@@ -7,43 +7,80 @@ app.use(bodyParser.json(), urlencoded({ extended: true }));
 app.use(cors());
 // tb puedo crear una variable allowedOrigins y declarar los sitios desde los cuales voy a acceder
 
-const product: { id: number; name: string; marca: string }[] = [
+const product: { id: number; name: string; brand: string }[] = [
   {
     name: "Teclado",
-    marca: "Logitech",
-    id: 2131231,
+    brand: "Logitech",
+    id: 69448,
   },
   {
     name: "Placa",
-    marca: "AMD",
-    id: 21312312,
+    brand: "AMD",
+    id: 846453,
+  },
+  {
+    name: "Teclado",
+    brand: "Logitech",
+    id: 43983,
+  },
+  {
+    name: "Placa",
+    brand: "AMD",
+    id: 439483,
+  },
+  {
+    name: "Teclado",
+    brand: "Logitech",
+    id: 463563,
+  },
+  {
+    name: "Placa",
+    brand: "AMD",
+    id: 6453,
+  },
+  {
+    name: "Teclado",
+    brand: "Corsair",
+    id: 8647,
+  },
+  {
+    name: "Placa",
+    brand: "Nvidia",
+    id: 54686,
   },
 ];
 
 app.get("/products", (req, res) => {
-  res.status(200).json(product);
+  const page: number = Number(req.query.page);
+  const limit: number = Number(req.query.limit);
+
+  const result = {};
+
+  const starIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+
+  const resultProducts = product.slice(starIndex, endIndex);
+
+  res.status(200).json(resultProducts);
 });
-/*
-Libreria body-parser resuelve problemas al interpretar el body 
-*/
 
 app.post("/products", (req, res) => {
-  const { name, marca } = req.body;
-  if (!name || !marca)
+  const { name, brand } = req.body;
+  if (!name || !brand)
     return res
       .status(400)
-      .json({ message: "fields 'name' and 'marca' are requiered" });
-  product.push({ id: new Date().getTime(), name, marca });
+      .json({ message: "fields 'name' and 'brand' are requiered" });
+  product.push({ id: new Date().getTime(), name, brand });
   return res.status(200).json(...product.slice(-1));
 });
 
 app.put("/products/:id", (req, res) => {
-  const { name, marca } = req.body;
+  const { name, brand } = req.body;
   const id = Number(req.params.id);
   const index = product.findIndex((product) => product.id === id);
   if (index === -1)
     return res.status(400).json({ message: "product not found" });
-  product[index] = { ...product[index], name, marca };
+  product[index] = { ...product[index], name, brand };
   res.status(200).json(product[index]);
 });
 
