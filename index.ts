@@ -7,7 +7,13 @@ app.use(bodyParser.json(), urlencoded({ extended: true }));
 app.use(cors());
 // tb puedo crear una variable allowedOrigins y declarar los sitios desde los cuales voy a acceder
 
-const product: { id: number; name: string; brand: string }[] = [
+type Product = {
+  id: number;
+  name: string;
+  brand: string;
+};
+
+const products: Product[] = [
   {
     name: "Teclado",
     brand: "Logitech",
@@ -51,55 +57,50 @@ const product: { id: number; name: string; brand: string }[] = [
 ];
 
 app.get("/products", (req, res) => {
-  const page: number = Number(req.query.page);
-  const limit: number = Number(req.query.limit);
-  const search: string = String(req.query.search);
+  const query = req.query as {
+    search?: string;
+    page?: number;
+    limit?: number;
+  };
+  let currentProducts: Product[] = products;
+  let startIndex = (query.page - 1) * query.limit;
+  let endIndex = query.page * query.limit;
+  let totalPages = Math.ceil(currentProducts.length / query.limit);
 
-  const result = {};
-
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  if (search !== "") {
-    const filteredProducts = product.filter(
-      (p) =>
-        p.name.toLowerCase().includes(search) ||
-        p.brand.toLowerCase().includes(search)
+  if (query.search) {
+    currentProducts = currentProducts.filter(
+      (p) => p.name.toLowerCase().includes(query.search) || p.brand.toLowerCase().includes(query.search.toLowerCase())
     );
-    const resultFilteredProducts = filteredProducts.slice(startIndex, endIndex);
-    res.status(200).json(resultFilteredProducts);
-  } else {
-    const resultProducts = product.slice(startIndex, endIndex);
-    res.status(200).json(resultProducts);
   }
+  if (query.page) {
+    const resultProducts = currentProducts.slice(startIndex, endIndex);
+    return res.status(200).json({ resultProducts, totalPages });
+  }
+  return res.status(200).json(currentProducts);
 });
 
 app.post("/products", (req, res) => {
   const { name, brand } = req.body;
-  if (!name || !brand)
-    return res
-      .status(400)
-      .json({ message: "fields 'name' and 'brand' are requiered" });
-  product.push({ id: new Date().getTime(), name, brand });
-  return res.status(200).json(...product.slice(-1));
+  if (!name || !brand) return res.status(400).json({ message: "fields 'name' and 'brand' are requiered" });
+  products.push({ id: new Date().getTime(), name, brand });
+  return res.status(200).json(...products.slice(-1));
 });
 
 app.put("/products/:id", (req, res) => {
   const { name, brand } = req.body;
   const id = Number(req.params.id);
-  const index = product.findIndex((product) => product.id === id);
-  if (index === -1)
-    return res.status(400).json({ message: "product not found" });
-  product[index] = { ...product[index], name, brand };
-  res.status(200).json(product[index]);
+  const index = products.findIndex((product) => product.id === id);
+  if (index === -1) return res.status(400).json({ message: "product not found" });
+  products[index] = { ...products[index], name, brand };
+  res.status(200).json(products[index]);
 });
 
 app.delete("/products/:id", (req, res) => {
   const id = Number(req.params.id);
-  const index = product.findIndex((product) => product.id === id);
-  if (index === -1)
-    return res.status(400).json({ message: "product not found" });
+  const index = products.findIndex((product) => product.id === id);
+  if (index === -1) return res.status(400).json({ message: "product not found" });
 
-  return res.status(200).json(product.splice(index, 1));
+  return res.status(200).json(products.splice(index, 1));
 });
 
 app.listen(3000);
